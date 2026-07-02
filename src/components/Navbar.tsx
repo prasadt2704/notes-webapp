@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sun, Moon, LogOut } from "lucide-react";
+import axios from "axios";
 
 export default function Navbar() {
   const [user, setUser] = useState<any>();
@@ -27,13 +28,13 @@ export default function Navbar() {
     // Check user auth
     const checkAuth = async () => {
       try {
-        const response = await fetch("/api/auth/me");
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
+        const response = await axios.get("/api/users/me");
+        if (response.status === 200) {
+          setUser(response.data);
         }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
+      } catch {
+        // Unauthenticated users can still view public routes; keep user empty.
+        setUser(null);
       }
     };
 
@@ -57,7 +58,7 @@ export default function Navbar() {
 
   const handleLogout = useCallback(async () => {
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await axios.get("/api/users/logout");
       setUser(null);
       router.push("/login");
     } catch (error) {
@@ -87,7 +88,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {pathname !== "/login" && pathname !== "/signup" && (
+      {pathname.startsWith("/notes") && (
         <>
           {user?.username && (
             <div className="flex items-center gap-4">

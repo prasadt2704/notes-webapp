@@ -19,7 +19,7 @@ export default function Home() {
           </button>
         </Link>
         <p className="text-gray-600 dark:text-gray-400 mt-6">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link href="/signup">
             <span className="text-blue-600 hover:text-blue-700 font-semibold cursor-pointer">
               Sign up here
