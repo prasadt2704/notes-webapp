@@ -1,26 +1,18 @@
 import { connect } from "../../../../dbConfig/dbConfig";
 import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { getTokenPayload } from "@/lib/auth";
 
 connect();
 
-type TokenPayload = {
-  id: string;
-  email: string;
-  username: string;
-};
-
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get("token")?.value;
-
-    if (!token) {
+    const payload = getTokenPayload(req);
+    if (!payload) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, process.env.TOKEN_SECRET!) as TokenPayload;
-    const user = await User.findById(decoded.id).select("username email");
+    const user = await User.findById(payload.id).select("username email");
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

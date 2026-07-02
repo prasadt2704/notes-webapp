@@ -6,9 +6,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sun, Moon, LogOut } from "lucide-react";
 import axios from "axios";
+import { useUser } from "@/context/UserContext";
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>();
+  const { clearUser } = useUser();
   const [isDark, setIsDark] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -25,20 +26,6 @@ export default function Navbar() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsDark(isDarkMode);
 
-    // Check user auth
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get("/api/users/me");
-        if (response.status === 200) {
-          setUser(response.data);
-        }
-      } catch {
-        // Unauthenticated users can still view public routes; keep user empty.
-        setUser(null);
-      }
-    };
-
-    checkAuth();
   }, []);
 
   const toggleTheme = useCallback(() => {
@@ -59,12 +46,12 @@ export default function Navbar() {
   const handleLogout = useCallback(async () => {
     try {
       await axios.get("/api/users/logout");
-      setUser(null);
+      clearUser();
       router.push("/login");
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  }, [router]);
+  }, [router, clearUser]);
 
   return (
     <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-gray-800">
@@ -73,10 +60,10 @@ export default function Navbar() {
           Notes
         </h1>
       </Link>
-      <div className="flex justify-end">
+      <div className="ml-auto flex items-center justify-end gap-3">
         <button
           onClick={toggleTheme}
-          className="p-2 gap-4 justify-end rounded-md hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors"
+          className="p-2 rounded-md hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors"
           aria-label="Toggle theme"
           type="button"
         >
@@ -86,27 +73,16 @@ export default function Navbar() {
             <Moon className="w-5 h-5 text-gray-700" />
           )}
         </button>
+        {pathname.startsWith("/notes") && (
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+            type="button"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        )}
       </div>
-
-      {pathname.startsWith("/notes") && (
-        <>
-          {user?.username && (
-            <div className="flex items-center gap-4">
-              <span className="text-gray-700 dark:text-gray-300 text-sm">
-                {user.username}
-              </span>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium flex items-center gap-2"
-                type="button"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
-            </div>
-          )}
-        </>
-      )}
     </nav>
   );
 }

@@ -22,8 +22,7 @@ export async function POST(req: NextRequest) {
 
     //Create a new user
     const newUser = new User({ username, email, password: hashedPassword });
-    const data = await newUser.save();
-    console.log("User created successfully:", data);
+    await newUser.save();
 
     return NextResponse.json({ message: "User created successfully" }, { status: 201 });
   } catch (error) {

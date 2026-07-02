@@ -4,9 +4,11 @@ import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useUser } from "@/context/UserContext";
 
 export default function LoginComponent() {
   const router = useRouter();
+  const { refreshUser } = useUser();
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -31,6 +33,7 @@ export default function LoginComponent() {
       const data = response.data as { message?: string };
       const successMessage = data.message ?? "Login successful";
 
+      await refreshUser();
       setMessage(successMessage);
       toast.success(successMessage);
       router.push("/notes");
