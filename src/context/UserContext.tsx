@@ -19,6 +19,8 @@ type User = {
 type UserContextType = {
   user: User | null;
   loadingUser: boolean;
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   refreshUser: () => Promise<void>;
   clearUser: () => void;
 };
@@ -28,6 +30,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const refreshUser = useCallback(async () => {
     try {
@@ -73,8 +76,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loadingUser, refreshUser, clearUser }),
-    [user, loadingUser, refreshUser, clearUser],
+    () => ({ user, loadingUser, searchQuery, setSearchQuery, refreshUser, clearUser }),
+    [user, loadingUser, searchQuery, refreshUser, clearUser],
   );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

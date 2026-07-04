@@ -59,10 +59,8 @@ export default function LoginComponent() {
   return (
       <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-black">
        <section className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm dark:bg-zinc-900">
-         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Welcome back</h1>
-         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Login to continue to your dashboard.</p>
-
-         <form className="mt-6 space-y-4">
+         
+         <form className="space-y-4">
            <div>
              <label htmlFor="email" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                Email

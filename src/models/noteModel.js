@@ -2,12 +2,11 @@ import mongoose from "mongoose";
 
 const notesSchema = new mongoose.Schema({
   id: {
-    type: Date,
-    default: Date.now,
+    type: String,
+    required: [true, "ID is required!"],
   },
   title: {
-    type: String,
-    required: [true, "Title is required!"],
+    type: String
   },
   content: {
     type: String,

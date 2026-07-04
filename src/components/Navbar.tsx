@@ -1,16 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { Sun, Moon, LogOut } from "lucide-react";
+import { Sun, Moon, LogOut, X } from "lucide-react";
 import axios from "axios";
 import { useUser } from "@/context/UserContext";
 
 export default function Navbar() {
-  const { clearUser } = useUser();
+  const { clearUser, searchQuery, setSearchQuery } = useUser();
   const [isDark, setIsDark] = useState(false);
+  const [searchInput, setSearchInput] = useState(searchQuery);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -26,6 +28,11 @@ export default function Navbar() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsDark(isDarkMode);
 
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
   }, []);
 
   const toggleTheme = useCallback(() => {
@@ -53,13 +60,72 @@ export default function Navbar() {
     }
   }, [router, clearUser]);
 
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchInput(value);
+
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+
+      debounceRef.current = setTimeout(() => {
+        console.log("Updating search query:", value);
+        setSearchQuery(value);
+      }, 300);
+    },
+    [setSearchQuery],
+  );
+
+  useEffect(() => {
+
+    if (searchInput.trim() && !isSearchActive) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsSearchActive(true);
+    }
+    
+    if (searchInput === '' && isSearchActive) {
+      setIsSearchActive(false);
+    }
+  }, [searchInput, isSearchActive]);
+
   return (
-    <nav className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-gray-800">
+    <nav className="flex items-center justify-between px-6 py-3 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-gray-800">
       <Link href="/">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white cursor-pointer">
           Notes
         </h1>
       </Link>
+      {pathname.startsWith("/notes") && (
+        <>
+          <div className="relative align-baseline m-auto w-180">
+            <input
+              placeholder="Search notes..."
+              value={searchInput}
+              onChange={(e) => {
+                handleSearchChange(e.target.value);
+              }}
+              onFocus={() => setIsSearchActive(true)}
+              className="flex w-full justify-center rounded-md bg-gray-100 px-3 py-2 pr-10 font-medium transition-colors active:border-0 dark:bg-zinc-700 dark:text-white"
+              type="text"
+            />
+            {isSearchActive && (
+              <button
+                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-1.5 transition-colors hover:bg-gray-200 dark:hover:bg-zinc-800"
+                aria-label="Clear search"
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  setSearchInput("");
+                  setSearchQuery("");
+                  setIsSearchActive(false);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </>
+      )}
       <div className="ml-auto flex items-center justify-end gap-3">
         <button
           onClick={toggleTheme}
