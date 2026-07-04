@@ -1,13 +1,11 @@
 "use client";
 
 import React, { useEffect, useCallback } from "react";
-import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
 
 export default function VerifyEmailPage() {
-  const { user } = useUser();
   const router = useRouter();
   const [token, setToken] = React.useState<string | null>(null);
 

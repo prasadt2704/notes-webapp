@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     // Check if the user already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      return NextResponse.json({ error: "User already exists" }, { status: 400 });
+      return NextResponse.json({ error: "Username or email already exists" }, { status: 400 });
     }
 
     //hash password

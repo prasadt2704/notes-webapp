@@ -1,3 +1,4 @@
+import "server-only";
 import nodemailer from "nodemailer";
 import User from "@/models/userModel";
 import bcrypt from "bcryptjs";
@@ -44,12 +45,13 @@ export async function sendEmail({
       from: "prasad@gmail.com",
       to: email,
       subject: emailType === "VERIFY" ? "Verify your account" : "Reset your password",
-      html: `<p>Click <a href="${process.env.DOMAIN}/users/${actionPath}?token=${hashed}">here</a> to ${emailType === "VERIFY" ? "verify your account" : "reset your password"}</p>`,
+      html: `<p>Click <a href="${process.env.DOMAIN}/${actionPath}?token=${hashed}">here</a> to ${emailType === "VERIFY" ? "verify your account" : "reset your password"}</p>`,
     };
 
     const mailResponse = await transport.sendMail(mailOptions);
     return mailResponse;
   } catch (error) {
     console.log("Error sending email: ", error);
+    throw error;
   }
 }

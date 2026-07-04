@@ -6,15 +6,19 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useUser } from "@/context/UserContext";
 
+type User = {
+  email: string;
+  password: string;
+}
+
 export default function LoginComponent() {
   const router = useRouter();
   const { refreshUser } = useUser();
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<User>({
     email: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -24,9 +28,32 @@ export default function LoginComponent() {
     }));
   };
 
+  const handlePasswordChange = async () => {
+    if (user.email.trim() === "") {
+      toast.error("Please enter your email to reset password");
+      return;
+    }
+
+    try {
+      await axios.post("/api/users/forgotpassword", { email: user.email });
+      toast.success("Password reset email sent. Please check your inbox.");
+    } catch (error: unknown) {
+      console.error("Error sending password reset email:", error);
+      let errorMessage = "Failed to send password reset email. Please try again later.";
+
+      if (axios.isAxiosError<{ error?: string; message?: string }>(error)) {
+        errorMessage =
+          error.response?.data?.error ??
+          error.response?.data?.message ??
+          error.message;
+      }
+
+      toast.error(errorMessage);
+    }
+  }
+
   const onLogin = async () => {
     setLoading(true);
-    setMessage("");
 
     try {
       const response = await axios.post("/api/users/login", user);
@@ -34,7 +61,6 @@ export default function LoginComponent() {
       const successMessage = data.message ?? "Login successful";
 
       await refreshUser();
-      setMessage(successMessage);
       toast.success(successMessage);
       router.push("/notes");
     } catch (error: unknown) {
@@ -50,7 +76,6 @@ export default function LoginComponent() {
       }
 
       toast.error(errorMessage);
-      setMessage(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -101,16 +126,16 @@ export default function LoginComponent() {
            </button>
          </form>
 
-         {message ? (
-           <p className="mt-4 text-center text-sm text-zinc-700 dark:text-zinc-300" role="status">
-             {message}
-           </p>
-         ) : null}
+         <p className="mt-2 cursor-pointer text-end text-sm text-zinc-600 dark:text-zinc-400">
+           <span onClick={handlePasswordChange} className="font-medium text-zinc-900 dark:text-zinc-200">
+             Forgot password?
+           </span>
+         </p>
 
          <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
            Don&apos;t have an account?{" "}
-           <Link href="/signup" className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-200">
-             Go to signup
+           <Link href="/signup" className="font-bold text text-zinc-900 dark:text-zinc-200">
+             Signup
            </Link>
          </p>
        </section>

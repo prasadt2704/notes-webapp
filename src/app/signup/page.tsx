@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -19,7 +19,7 @@ export default function SignupComponent() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -29,15 +29,25 @@ export default function SignupComponent() {
     }));
   };
 
+  useEffect(() => {
+      if(user.email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(user.email)) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
+          setError("Please enter a valid email address");
+        } else {
+          setError("");
+        }
+      }
+  }, [user.email]);
+
   const onSignup = async () => {
     setLoading(true);
-    setMessage("");
 
     try {
       const response = await axios.post("/api/users/signup", user);
       const data = response.data;
 
-      setMessage(data.message ?? "Signup successful");
       toast.success(data.message ?? "Signup successful");
       setUser({
         username: "",
@@ -46,7 +56,6 @@ export default function SignupComponent() {
       });
       router.push("/login");
     } catch (error: unknown) {
-      console.log('failed here')
       let errorMessage = "Something went wrong";
 
       if (axios.isAxiosError<{ error?: string; message?: string }>(error)) {
@@ -59,7 +68,6 @@ export default function SignupComponent() {
       }
 
       toast.error(errorMessage);
-      setMessage(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -99,6 +107,7 @@ export default function SignupComponent() {
               onChange={onInputChange}
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none ring-0 transition focus:border-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-zinc-400"
             />
+            {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
           </div>
 
           <div>
@@ -119,18 +128,12 @@ export default function SignupComponent() {
           <button
             onClick={() => onSignup()}
             type="button"
-            disabled={loading || !user.username || !user.email || !user.password}
+            disabled={loading || Boolean(error) || !user.username || !user.email || !user.password}
             className="w-full flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-500 disabled:opacity-25 dark:bg-blue-700 dark:hover:bg-blue-600"
           >
             {loading ? "Signing up..." : "Sign up"}
           </button>
         </form>
-
-        {message ? (
-          <p className="mt-4 text-center text-sm text-zinc-700 dark:text-zinc-300" role="status">
-            {message}
-          </p>
-        ) : null}
 
         <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
           Already have an account?{" "}
