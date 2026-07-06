@@ -121,7 +121,7 @@ export default function NotesPage() {
         <Plus className="w-5 h-5" />
       </button>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="mt-6 h-100% columns-1 gap-4 sm:columns-2 lg:columns-4">
         {notes.map((item) => (
           <article
             key={item.id}
@@ -129,14 +129,16 @@ export default function NotesPage() {
               setUpdateNote(item);
               setIsModalOpen(true);
             }}
-            className="group flex min-h-50 h-70 flex-col rounded-lg border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            className="group mb-4 flex w-full max-h-150 break-inside-avoid flex-col rounded-lg border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
           >
             <h3 className="mb-2 truncate text-xl font-semibold text-zinc-900 dark:text-white">
               {item.title}
             </h3>
-            <p className="text-sm h-50 overflow-y-scroll text-zinc-700 dark:text-zinc-300">{item.content}</p>
+            <p className="text-sm line-clamp-22 max-h-110 overflow-hidden text-zinc-700 dark:text-zinc-300">
+              {item.content}
+            </p>
             <div
-              className="mt-auto flex items-center justify-end gap-2 pt-1 opacity-0 transition-opacity group-hover:opacity-100"
+              className="flex items-center justify-end gap-2 pt-1 opacity-0 transition-opacity group-hover:opacity-100"
               onClick={(event) => event.stopPropagation()}
             >
               <button
