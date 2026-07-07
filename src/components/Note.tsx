@@ -47,6 +47,7 @@ export default function NoteModal({
               onChange={(event) => setTitle(event.target.value)}
               className="w-full m-0 rounded-md px-3 py-2 text-2xl font-bold text-zinc-1000 outline-none transition-colors focus:border-blue-500 dark:text-white"
               placeholder="Title"
+              autoComplete="off"
             />
           </>
 

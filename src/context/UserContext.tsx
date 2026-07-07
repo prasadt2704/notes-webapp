@@ -5,7 +5,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -29,7 +28,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const refreshUser = useCallback(async () => {
@@ -46,33 +45,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const clearUser = useCallback(() => {
     setUser(null);
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadUser = async () => {
-      try {
-        const response = await axios.get("/api/users/me");
-        if (mounted) {
-          setUser(response.data);
-        }
-      } catch {
-        if (mounted) {
-          setUser(null);
-        }
-      } finally {
-        if (mounted) {
-          setLoadingUser(false);
-        }
-      }
-    };
-
-    void loadUser();
-
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   const value = useMemo(
