@@ -62,7 +62,7 @@ export default function LoginComponent() {
 
       await refreshUser();
       toast.success(successMessage);
-      router.push("/notes");
+      router.push("/scripts");
     } catch (error: unknown) {
       let errorMessage = "Something went wrong";
 

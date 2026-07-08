@@ -7,7 +7,7 @@ export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const isAuthenticated = request.cookies.get('token')?.value;
 
-  if (!isAuthenticated && (path === '/notes')) {
+  if (!isAuthenticated && (path === '/scripts' || path === '/profile')) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
@@ -15,7 +15,7 @@ export function proxy(request: NextRequest) {
 
   if (isAuthenticated && (path === '/login' || path === '/signup' || path === '/')) {
     const url = request.nextUrl.clone();
-    url.pathname = '/notes';
+    url.pathname = '/scripts';
     return NextResponse.redirect(url);
   }
 
@@ -23,5 +23,5 @@ export function proxy(request: NextRequest) {
 }
  
 export const config = {
-  matcher: [ '/', '/login', '/signup', '/notes/:path*', '/verifyemail', '/resetpassword', '/forgotpassword' ],
+  matcher: [ '/', '/login', '/signup', '/scripts/:path*', '/profile', '/verifyemail', '/resetpassword', '/forgotpassword' ],
 }
