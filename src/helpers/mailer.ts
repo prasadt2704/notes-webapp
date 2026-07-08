@@ -48,18 +48,18 @@ export async function sendEmail({
     const actionText = emailType === "VERIFY" ? "Verify Your Email" : "Reset Your Password";
     const actionButtonText = emailType === "VERIFY" ? "Verify Email" : "Reset Password";
     const actionDescription = emailType === "VERIFY" 
-      ? "Thank you for signing up! Please verify your email address to activate your account and start taking notes." 
+      ? "Thank you for signing up! Please verify your email address to activate your account and start creating content scripts." 
       : "We received a request to reset your password. Click the button below to set a new password.";
 
     const mailOptions = {
       from: "hello@demomailtrap.co",
       to: email,
-      subject: emailType === "VERIFY" ? "Verify your account - Notes App" : "Reset your password - Notes App",
+      subject: emailType === "VERIFY" ? "Verify your account - Scripta" : "Reset your password - Scripta",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
           <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <h2 style="color: #333; margin-bottom: 10px; text-align: center;">${actionText}</h2>
-            <p style="color: #666; text-align: center; margin-bottom: 5px; font-size: 14px;">Notes App</p>
+            <p style="color: #666; text-align: center; margin-bottom: 5px; font-size: 14px;">Scripta</p>
             
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
             
@@ -98,7 +98,7 @@ export async function sendEmail({
             
             <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: center;">
               <p style="color: #999; font-size: 12px; margin: 0;">
-                © 2026 Notes App. All rights reserved.
+                © 2026 Scripta. All rights reserved.
               </p>
             </div>
           </div>

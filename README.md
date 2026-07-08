@@ -143,8 +143,7 @@ src/
 │   └── login/, signup/        # Auth pages
 ├── components/
 │   ├── Navbar.tsx            # Navigation bar
-│   ├── ScriptForm.tsx        # Reusable script form
-│   └── Note.tsx
+│   └── ScriptForm.tsx        # Reusable script form
 ├── context/
 │   └── UserContext.tsx       # Global user state
 ├── models/
