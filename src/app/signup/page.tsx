@@ -1,5 +1,5 @@
-"use client"
-import React, { useState, useEffect } from "react";
+"use client";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -20,6 +20,7 @@ export default function SignupComponent() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -27,19 +28,36 @@ export default function SignupComponent() {
       ...prevUser,
       [name]: value,
     }));
-  };
 
-  useEffect(() => {
-      if(user.email) {
+    // Debounced email validation on change
+    if (name === "email") {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+
+      if (value.trim() === "") {
+        setError("");
+        return;
+      }
+
+      debounceRef.current = setTimeout(() => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(user.email)) {
-          // eslint-disable-next-line react-hooks/set-state-in-effect
+        if (!emailRegex.test(value)) {
           setError("Please enter a valid email address");
         } else {
           setError("");
         }
+      }, 500);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
       }
-  }, [user.email]);
+    };
+  }, []);
 
   const onSignup = async () => {
     setLoading(true);
@@ -76,11 +94,16 @@ export default function SignupComponent() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-black">
       <section className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm dark:bg-zinc-900">
-        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">Create account</h1>
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          Create account
+        </h1>
 
         <form className="mt-6 space-y-4">
           <div>
-            <label htmlFor="username" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label
+              htmlFor="username"
+              className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            >
               Username
             </label>
             <input
@@ -95,7 +118,10 @@ export default function SignupComponent() {
           </div>
 
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label
+              htmlFor="email"
+              className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            >
               Email
             </label>
             <input
@@ -107,11 +133,18 @@ export default function SignupComponent() {
               onChange={onInputChange}
               className="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none ring-0 transition focus:border-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-zinc-400"
             />
-            {error && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>}
+            {error && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {error}
+              </p>
+            )}
           </div>
 
           <div>
-            <label htmlFor="password" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            <label
+              htmlFor="password"
+              className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
+            >
               Password
             </label>
             <input
@@ -128,7 +161,13 @@ export default function SignupComponent() {
           <button
             onClick={() => onSignup()}
             type="button"
-            disabled={loading || Boolean(error) || !user.username || !user.email || !user.password}
+            disabled={
+              loading ||
+              Boolean(error) ||
+              !user.username ||
+              !user.email ||
+              !user.password
+            }
             className="w-full flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-500 disabled:opacity-25 dark:bg-blue-700 dark:hover:bg-blue-600"
           >
             {loading ? "Signing up..." : "Sign up"}
@@ -137,7 +176,10 @@ export default function SignupComponent() {
 
         <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-200">
+          <Link
+            href="/login"
+            className="font-medium text-zinc-900 underline underline-offset-4 dark:text-zinc-200"
+          >
             Go to login
           </Link>
         </p>

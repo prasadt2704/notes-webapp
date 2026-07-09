@@ -80,6 +80,7 @@ export default function ProfilePage() {
     } catch (error: unknown) {
       const err = error as { response?: { data?: { error?: string } } };
       toast.error(err.response?.data?.error || "Failed to update profile");
+      setUsername(user?.username || "");
     } finally {
       setLoading(false);
     }

@@ -52,7 +52,7 @@ export async function sendEmail({
       : "We received a request to reset your password. Click the button below to set a new password.";
 
     const mailOptions = {
-      from: "hello@demomailtrap.co",
+      from: process.env.EMAIL_FROM,
       to: email,
       subject: emailType === "VERIFY" ? "Verify your account - Scripta" : "Reset your password - Scripta",
       html: `
